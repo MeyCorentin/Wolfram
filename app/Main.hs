@@ -36,7 +36,7 @@ isNumber (x) = all isDigit x
 myWolfram :: Int -> Int -> Int -> Int -> Int -> IO (Int)
 myWolfram  rule start printlines window move | rule == -84 || start == -84 || printlines == -84 || window == -84 ||move == -84 = return(-84)
 myWolfram _ _ 0 _ _  = return(0)
-myWolfram  rule start linesPrint window move = wLoop wCreateLeft wCreateRight rule start linesPrint window move
+myWolfram  rule start linesPrint window move = wLoop ([" "] ++ wCalculInfinite) (["*"] ++ wCalculInfinite) rule start linesPrint window move
 
 wLoop :: [String] -> [String] -> Int -> Int -> Int -> Int -> Int -> IO (Int)
 wLoop _ _ _ _ 0 _ _ = return (0)
@@ -60,12 +60,6 @@ loopCreateL :: [Int] -> [String] -> String -> Int -> [String]
 loopCreateL binary (x:xs) other 0 =     (wMapCells binary (head xs) x other )  ++ (loopCreateL binary (x:xs) other 1)
 loopCreateL binary (x:xs:xss) other 1 = (wMapCells binary  (head xss) xs    x) ++ (loopCreateL binary (xs:xss) other 1)
 
-displayLine :: Int -> Int  -> [String] -> IO ()
-displayLine _ _ []  = return ()
-displayLine linesPrint window (x:xs) = do
-    putStr x
-    displayLine linesPrint window xs
-
 wMapCells :: [Int] -> String -> String -> String -> [String]
 wMapCells binary " " " " " " |  (head binary) == 1 = ["*"]
 wMapCells binary " " " " "*" |  (head (drop 1 binary)) == 1 = ["*"]
@@ -77,14 +71,14 @@ wMapCells binary "*" "*" " " |  (head (drop 6 binary)) == 1 = ["*"]
 wMapCells binary "*" "*" "*" |  (head (drop 7 binary)) == 1 = ["*"]
 wMapCells _ _ _ _ = [" "]
 
-wCreateRight::  [String]
-wCreateRight =  ["*"] ++ wCalculInfinite
-
-wCreateLeft::  [String]
-wCreateLeft =  [" "] ++ wCalculInfinite
-
 wCalculInfinite ::  [String]
 wCalculInfinite = [" "] ++ wCalculInfinite
+
+displayLine :: Int -> Int  -> [String] -> IO ()
+displayLine _ _ []  = return ()
+displayLine linesPrint window (x:xs) = do
+    putStr x
+    displayLine linesPrint window xs
 
 isNotArgs :: String -> Bool     
 isNotArgs a 
