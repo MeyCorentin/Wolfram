@@ -36,21 +36,21 @@ isNumber (x) = all isDigit x
 myWolfram :: Int -> Int -> Int -> Int -> Int -> IO (Int)
 myWolfram  rule start printlines window move | rule == -84 || start == -84 || printlines == -84 || window == -84 ||move == -84 = return(-84)
 myWolfram _ _ 0 _ _  = return(0)
-myWolfram  rule start lines window move = wLoop wCreateLeft wCreateRight rule start lines window move
+myWolfram  rule start linesPrint window move = wLoop wCreateLeft wCreateRight rule start linesPrint window move
 
 wLoop :: [String] -> [String] -> Int -> Int -> Int -> Int -> Int -> IO (Int)
 wLoop _ _ _ _ 0 _ _ = return (0)
-wLoop left right rule start lines window move |start /= 0 = do
+wLoop left right rule start linesPrint window move |start /= 0 = do
     let createRight = loopCreate (addZero (intToBin rule)) right (head left) 0 
     let createLeft = loopCreateL (addZero (intToBin rule)) (left) (head right) 0 
-    wLoop createLeft createRight rule (start - 1) lines window move
-wLoop left right rule start lines window move = do
-    displayLine window lines (reverse (take ((window + move) `div` 2) left))
-    displayLine window lines (take ((window - move) `div` 2) right)
+    wLoop createLeft createRight rule (start - 1) linesPrint window move
+wLoop left right rule start linesPrint window move = do
+    displayLine window linesPrint (reverse (take ((window + move) `div` 2) left))
+    displayLine window linesPrint (take ((window - move) `div` 2) right)
     putStr ("\n")
     let createRight = loopCreate (addZero (intToBin rule)) right (head left) 0 
     let createLeft = loopCreateL (addZero (intToBin rule)) (left) (head right) 0 
-    wLoop createLeft createRight rule start (lines - 1) window move
+    wLoop createLeft createRight rule start (linesPrint - 1) window move
 
 loopCreate :: [Int] -> [String] -> String -> Int -> [String]    
 loopCreate binary (x:xs) other 0 =     (wMapCells binary other x  (head xs))  ++ (loopCreate binary (x:xs) other 1)
@@ -62,9 +62,9 @@ loopCreateL binary (x:xs:xss) other 1 = (wMapCells binary  (head xss) xs    x) +
 
 displayLine :: Int -> Int  -> [String] -> IO ()
 displayLine _ _ []  = return ()
-displayLine liness window (x:xs) = do
+displayLine linesPrint window (x:xs) = do
     putStr x
-    displayLine liness window xs
+    displayLine linesPrint window xs
 
 wMapCells :: [Int] -> String -> String -> String -> [String]
 wMapCells binary " " " " " " |  (head binary) == 1 = ["*"]
