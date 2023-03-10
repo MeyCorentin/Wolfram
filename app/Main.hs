@@ -34,7 +34,7 @@ isNumber ('-':xs) = all isDigit xs
 isNumber (x) = all isDigit x
 
 myWolfram :: Int -> Int -> Int -> Int -> Int -> IO (Int)
-myWolfram  rule start printlines window move | rule == 84 || start == 84 || printlines == 84 || window == -84 ||move == -84 = return(84)
+myWolfram  rule start printlines window move | rule == 84 || start == 84 || printlines == 84 || window == 84 ||move == 84 = return(84)
 myWolfram _ _ 0 _ _  = return(0)
 myWolfram  rule start linesPrint window move = wLoop ([" "] ++ wCalculInfinite) (["*"] ++ wCalculInfinite) rule start linesPrint window move
 
@@ -45,11 +45,11 @@ wLoop left right rule start linesPrint window move |start /= 0 = do
     let createLeft = loopCreateL (addZero (intToBin rule)) (left) (head right) 0 
     wLoop createLeft createRight rule (start - 1) linesPrint window move
 wLoop left right rule start linesPrint window move = do
-    displayLine window linesPrint (reverse (take ((window ) `div` 2) left))
-    displayLine window linesPrint (take ((window ) `div` 2) right)
+    displayLine window linesPrint (reverse (take (((window)`div` 2) + move) left))
+    displayLine window linesPrint (take (((window)`div` 2) + (window `mod` 2) - move) right)
     putStr ("\n")
     let createRight = loopCreate (addZero (intToBin rule)) right (head left) 0 
-    let createLeft = loopCreateL (addZero (intToBin rule)) (left) (head right) 0 
+    let createLeft = loopCreateL (addZero (intToBin     rule)) (left) (head right) 0 
     wLoop createLeft createRight rule start (linesPrint - 1) window move
 
 loopCreate :: [Int] -> [String] -> String -> Int -> [String]    
@@ -82,19 +82,19 @@ displayLine linesPrint window (x:xs) = do
 
 isNotArgs :: String -> Bool     
 isNotArgs a 
-    | (not (elem a ["--rule","--start","--lines","--window","--move"])) = True
+    | a /= "--rule" && a /= "--start" && a /= "--lines" && a /= "--window" && a /= "--move" = True
     | otherwise                                                         = False
 
 getParsedArgs :: [String] -> String -> Int -> Int  
 getParsedArgs [] _ defaultValue = defaultValue
 getParsedArgs (x:xs) name defaultValue
-    | (x == name && (null xs) || ( isNotArgs x)) && not (isNumber x)    = -84
+    | (x == name && (null xs) || ( isNotArgs x)) && not (isNumber x)    = 84
     | x == name && not (null xs) && (isNumber (head xs))                =  read (head xs) :: Int
     | otherwise                                                         = getParsedArgs  xs name defaultValue                                                                  
 
 getRule :: [String] -> Int
-getRule [] = -84
+getRule [] = 84
 getRule (x:xs)
-    | (x =="--rule" && (null xs) || ( isNotArgs x)) && not (isNumber x)                                                           = -84
+    | (x =="--rule" && (null xs) || ( isNotArgs x)) && not (isNumber x)                                                           = 84
     | x =="--rule" && not (null xs) && (isNumber (head xs)) && (read (head xs) :: Int) > 0 && (read (head xs) :: Int) < 257       = read (head xs) :: Int
     | otherwise                                                                                                                   = getRule xs
