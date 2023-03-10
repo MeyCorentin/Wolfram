@@ -34,7 +34,7 @@ isNumber ('-':xs) = all isDigit xs
 isNumber (x) = all isDigit x
 
 myWolfram :: Int -> Int -> Int -> Int -> Int -> IO (Int)
-myWolfram  rule start printlines window move | rule == -84 || start == -84 || printlines == -84 || window == -84 ||move == -84 = return(-84)
+myWolfram  rule start printlines window move | rule == 84 || start == 84 || printlines == 84 || window == -84 ||move == -84 = return(84)
 myWolfram _ _ 0 _ _  = return(0)
 myWolfram  rule start linesPrint window move = wLoop ([" "] ++ wCalculInfinite) (["*"] ++ wCalculInfinite) rule start linesPrint window move
 
@@ -45,8 +45,8 @@ wLoop left right rule start linesPrint window move |start /= 0 = do
     let createLeft = loopCreateL (addZero (intToBin rule)) (left) (head right) 0 
     wLoop createLeft createRight rule (start - 1) linesPrint window move
 wLoop left right rule start linesPrint window move = do
-    displayLine window linesPrint (reverse (take ((window + move) `div` 2) left))
-    displayLine window linesPrint (take ((window - move) `div` 2) right)
+    displayLine window linesPrint (reverse (take ((window ) `div` 2) left))
+    displayLine window linesPrint (take ((window ) `div` 2) right)
     putStr ("\n")
     let createRight = loopCreate (addZero (intToBin rule)) right (head left) 0 
     let createLeft = loopCreateL (addZero (intToBin rule)) (left) (head right) 0 
