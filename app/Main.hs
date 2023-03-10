@@ -1,6 +1,7 @@
 module Main (main) where
 import System.Environment
 import Data.Char (isDigit)
+import System.Exit
 
 main :: IO (Int)
 main = do
@@ -18,7 +19,7 @@ ruleBinary n    | n `mod` 2 == 1 = ruleBinary (n `div` 2) ++ [1]
 
 addZero :: [Int] -> [Int]
 addZero (list) = if (length list) < 8 then (addZero ((list) ++ [0])) else (list)
-    
+
 launch :: [String] -> IO (Int)
 launch args =
     myWolfram rule start printlines window move
@@ -34,7 +35,7 @@ isNumber ('-':xs) = all isDigit xs
 isNumber (x) = all isDigit x
 
 myWolfram :: Int -> Int -> Int -> Int -> Int -> IO (Int)
-myWolfram  rule start printlines window move | rule == 84 || start == 84 || printlines == 84 || window == 84 ||move == 84 = return(84)
+myWolfram  rule start printlines window move | rule == 84 || start == 84 || printlines == 84 || window == 84 ||move == 84 =  exitWith (ExitFailure 84)
 myWolfram _ _ 0 _ _  = return(0)
 myWolfram  rule start linesPrint window move = wLoop ([" "] ++ wCalculInfinite) (["*"] ++ wCalculInfinite) rule start linesPrint window move
 
@@ -46,7 +47,7 @@ wLoop left right rule start linesPrint window move |start /= 0 = do
     wLoop createLeft createRight rule (start - 1) linesPrint window move
 wLoop left right rule start linesPrint window move = do
     displayLine window linesPrint (reverse (take (((window)`div` 2) + move) left))
-    displayLine window linesPrint (take (((window)`div` 2) + (window `mod` 2) - move) right)
+    displayLine window linesPrint (take (((window)`div` 2) + ((window) `mod` 2) - move) right)
     putStr ("\n")
     let createRight = loopCreate (addZero (intToBin rule)) right (head left) 0 
     let createLeft = loopCreateL (addZero (intToBin     rule)) (left) (head right) 0 
