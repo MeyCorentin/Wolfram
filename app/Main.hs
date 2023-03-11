@@ -1,3 +1,10 @@
+--
+-- EPITECH PROJECT, 2023
+-- Wolfram
+-- File description:
+-- Main
+--
+
 module Main (main) where
 import System.Environment
 import Data.Char (isDigit)
@@ -37,7 +44,8 @@ isNumber (x) = all isDigit x
 myWolfram :: Int -> Int -> Int -> Int -> Int -> IO (Int)
 myWolfram  rule start printlines window move | rule == 84 || start == 84 || printlines == 84 || window == 84 ||move == 84 =  exitWith (ExitFailure 84)
 myWolfram _ _ 0 _ _  = return(0)
-myWolfram  rule start linesPrint window move = wLoop ([" "] ++ wCalculInfinite) (["*"] ++ wCalculInfinite) rule start linesPrint window move
+myWolfram  rule start linesPrint window move = wLoop ([" "] ++ wCalculInfinite)
+                    (["*"] ++ wCalculInfinite) rule start linesPrint window move
 
 wLoop :: [String] -> [String] -> Int -> Int -> Int -> Int -> Int -> IO (Int)
 wLoop _ _ _ _ 0 _ _ = return (0)
@@ -46,20 +54,26 @@ wLoop left right rule start linesPrint window move |start /= 0 = do
     let createLeft = loopCreateL (addZero (intToBin rule)) (left) (head right) 0 
     wLoop createLeft createRight rule (start - 1) linesPrint window move
 wLoop left right rule start linesPrint window move = do
-    displayLine window linesPrint (reverse (take (((window)`div` 2) + move) left))
-    displayLine window linesPrint (take (((window)`div` 2) + ((window) `mod` 2) - move) right)
+    displayLine window linesPrint 
+        (reverse (take (((window)`div` 2) + move) left))
+    displayLine window linesPrint
+        (take (((window)`div` 2) + ((window) `mod` 2) - move) right)
     putStr ("\n")
     let createRight = loopCreate (addZero (intToBin rule)) right (head left) 0 
-    let createLeft = loopCreateL (addZero (intToBin     rule)) (left) (head right) 0 
+    let createLeft = loopCreateL (addZero (intToBin rule)) (left) (head right) 0 
     wLoop createLeft createRight rule start (linesPrint - 1) window move
 
 loopCreate :: [Int] -> [String] -> String -> Int -> [String]    
-loopCreate binary (x:xs) other 0 =     (wMapCells binary other x  (head xs))  ++ (loopCreate binary (x:xs) other 1)
-loopCreate binary (x:xs:xss) other 1 = (wMapCells binary  x    xs (head xss)) ++ (loopCreate binary (xs:xss) other 1)
+loopCreate binary (x:xs) other 0 = (wMapCells binary other x (head xs))
+                                    ++ (loopCreate binary (x:xs) other 1)
+loopCreate binary (x:xs:xss) other 1 = (wMapCells binary x xs (head xss)) 
+                                        ++ (loopCreate binary (xs:xss) other 1)
 
 loopCreateL :: [Int] -> [String] -> String -> Int -> [String]    
-loopCreateL binary (x:xs) other 0 =     (wMapCells binary (head xs) x other )  ++ (loopCreateL binary (x:xs) other 1)
-loopCreateL binary (x:xs:xss) other 1 = (wMapCells binary  (head xss) xs    x) ++ (loopCreateL binary (xs:xss) other 1)
+loopCreateL binary (x:xs) other 0 = (wMapCells binary (head xs) x other ) 
+                                    ++ (loopCreateL binary (x:xs) other 1)
+loopCreateL binary (x:xs:xss) other 1 = (wMapCells binary  (head xss) xs    x)
+                                        ++ (loopCreateL binary (xs:xss) other 1)
 
 wMapCells :: [Int] -> String -> String -> String -> [String]
 wMapCells binary " " " " " " |  (head binary) == 1 = ["*"]
@@ -83,19 +97,22 @@ displayLine linesPrint window (x:xs) = do
 
 isNotArgs :: String -> Bool     
 isNotArgs a 
-    | a /= "--rule" && a /= "--start" && a /= "--lines" && a /= "--window" && a /= "--move" = True
-    | otherwise                                                         = False
+    | a /= "--rule" && a /= "--start" && a /= "--lines" && a /= "--window"
+                    && a /= "--move" = True
+    | otherwise = False
 
 getParsedArgs :: [String] -> String -> Int -> Int  
 getParsedArgs [] _ defaultValue = defaultValue
 getParsedArgs (x:xs) name defaultValue
-    | (x == name && (null xs) || ( isNotArgs x)) && not (isNumber x)    = 84
-    | x == name && not (null xs) && (isNumber (head xs))                =  read (head xs) :: Int
-    | otherwise                                                         = getParsedArgs  xs name defaultValue                                                                  
+    | (x == name && (null xs) || ( isNotArgs x)) && not (isNumber x) = 84
+    | x == name && not (null xs) && (isNumber (head xs)) = read (head xs) :: Int
+    | otherwise = getParsedArgs  xs name defaultValue                                                                  
 
 getRule :: [String] -> Int
 getRule [] = 84
 getRule (x:xs)
-    | (x =="--rule" && (null xs) || ( isNotArgs x)) && not (isNumber x)                                                           = 84
-    | x =="--rule" && not (null xs) && (isNumber (head xs)) && (read (head xs) :: Int) > 0 && (read (head xs) :: Int) < 257       = read (head xs) :: Int
-    | otherwise                                                                                                                   = getRule xs
+    | (x =="--rule" && (null xs) || ( isNotArgs x)) && not (isNumber x) = 84
+    | x =="--rule" && not (null xs) && (isNumber (head xs)) && 
+        (read (head xs) :: Int) > 0 && 
+        (read (head xs) :: Int) < 257 = read (head xs) :: Int
+    | otherwise = getRule xs
